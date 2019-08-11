@@ -7,7 +7,10 @@ import(
 	"strconv"
 	"log"
 	"fmt"
+	"util"
 	"github.com/hbakhtiyor/strsim"
+	"bytes"
+	"encoding/gob"
 	//"github.com/umahmood/haversine"
 	"sort"
 )
@@ -20,47 +23,11 @@ const(
 	iCountry int = 3
 )
 type latlon struct{
-	lat float64
-	lon float64
-	country string
+	Lat float64
+	Lon float64
+	Country string
 }
 
-//https://stackoverflow.com/questions/5884154/read-text-file-into-string-array-and-write
-// readLines reads a whole file into memory
-// and returns a slice of its lines.
-func readLines(path string) ([]string, error) {
-    file, err := os.Open(path)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
-
-    var lines []string
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        lines = append(lines, scanner.Text())
-    }
-    return lines, scanner.Err()
-}
-
-//https://stackoverflow.com/questions/34259800/is-there-a-built-in-min-function-for-a-slice-of-int-arguments-or-a-variable-numb
-func MinMax(array []float64) (float64, float64, int, int) {
-    var max float64 = array[0]
-	var min float64 = array[0]
-	var indmin int = 0
-	var indmax int = 0
-    for i, value := range array {
-        if max < value {
-			max = value
-			indmax = i
-        }
-        if min > value {
-			min = value
-			indmin = i
-        }
-    }
-    return min, max, indmin, indmax
-}
 func makeMap(lines []string) map[string]latlon{
 	ret := make(map[string]latlon)
 	for _, line := range lines{
@@ -73,9 +40,9 @@ func makeMap(lines []string) map[string]latlon{
 			log.Fatal(err)
 		}
 		info := latlon{
-			lat: lat,
-			lon: lon,
-			country: country,
+			Lat: lat,
+			Lon: lon,
+			Country: country,
 		}
 		ret[airport] = info
 
@@ -95,23 +62,49 @@ func findAirport(key string, m map[string]latlon) string{
 		distances := make([]float64, len(m))
 		i:=0
 		for _,k := range(keys){
-			// fmt.Println(k)
 			distances[i] = strsim.Compare(key, k)
 			i = i + 1
 		}
-		_,_, _, iClosest := MinMax(distances)
+		_,_, _, iClosest := util.MinMax(distances)
 
 		closestKey := keys[iClosest]
 		return closestKey
 	}
 }
+func getMap(lines []string) map[string]latlon {
+	var network bytes.Buffer        // Stand-in for a network connection
+	var m map[string]latlon
+	if _, err := os.Stat("airports.gob"); err == nil {
+		dec := gob.NewDecoder(&network)
+		
+		err = dec.Decode(&m)
+		if err != nil {
+			log.Fatal("decode error:", err)
+		}
+
+	} else {
+		m = makeMap(lines)
+		enc := gob.NewEncoder(&network) // Will write to network.
+		err := enc.Encode(m)
+		if err != nil {
+			log.Fatal("encode error:", err)
+		}
+	}
+	return m
+}
 func main() {
-	lines,err := readLines("airports.dat")
+	lines,err := util.ReadLines("airports.dat")
 	if err != nil{
 		log.Fatal(err)
 	}
-	airportMap := makeMap(lines)
+	airportMap := getMap(lines)
 
-	fmt.Println(findAirport("Arlanda", airportMap))
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Airport 1: ")
+	port1, _ := reader.ReadString('\n')
+	fmt.Print("Airport 2: ")
+	port2, _ := reader.ReadString('\n')
+	fmt.Println(findAirport(port1, airportMap))
+	fmt.Println(findAirport(port2, airportMap))
 
 }
