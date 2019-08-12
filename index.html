@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+
+</head>
+<body>
+    <div>
+        <h1>Calculate Fuel</h1>
+        <form method="POST">
+            <label>From Airport:</label><br />
+            <input type="text" name="from"><br />
+            <label>To Airport:</label><br />
+            <input type="text" name="to"><br />
+            <input type="submit">
+        </form>
+    </div>
+    <div>
+        <h1> Consumption </h1>
+        {{if .Success}}
+            <p>
+                From <b> {{.FromAirport}} </b>, <b> {{.FromCountry}} </b> to <b>{{.ToAirport}}</b>, <b> {{.ToCountry}} </b> :
+            </p>
+            <h3> {{.Km}} km </h3>
+            <h3> {{.Consumption}} L </h3></br>
+        {{else}}
+            <h4>Consumption data will be posted once you have submitted the form.</h4>
+        {{end}}
+
+    </div>
+    
+</body>

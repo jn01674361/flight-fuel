@@ -1,18 +1,18 @@
 package main
 
 import(
-	"bufio"
 	"os"
 	"strings"
 	"strconv"
 	"log"
-	"fmt"
 	"util"
 	"github.com/hbakhtiyor/strsim"
 	"bytes"
 	"encoding/gob"
-	//"github.com/umahmood/haversine"
+	"github.com/umahmood/haversine"
 	"sort"
+    "html/template"
+    "net/http"
 )
 const(
 	gallonsMile int = 5
@@ -92,6 +92,21 @@ func getMap(lines []string) map[string]latlon {
 	}
 	return m
 }
+func computeFuel(strPort1, strPort2 string, airportMap map[string]latlon) (float64, float64) {
+	var ret float64
+	var coords1, coords2 latlon
+
+	coords1 = airportMap[strPort1]
+	coords2 = airportMap[strPort2]
+
+
+	r1 := haversine.Coord{Lat: coords1.Lat, Lon: coords1.Lon}  // Oxford, UK
+	r2  := haversine.Coord{Lat: coords2.Lat, Lon: coords2.Lon}  // Turin, Italy
+	_, km := haversine.Distance(r1, r2)
+	
+	ret= float64(litersKilometer)*km
+	return ret, km
+}
 func main() {
 	lines,err := util.ReadLines("airports.dat")
 	if err != nil{
@@ -99,12 +114,44 @@ func main() {
 	}
 	airportMap := getMap(lines)
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Airport 1: ")
-	port1, _ := reader.ReadString('\n')
-	fmt.Print("Airport 2: ")
-	port2, _ := reader.ReadString('\n')
-	fmt.Println(findAirport(port1, airportMap))
-	fmt.Println(findAirport(port2, airportMap))
 
+	tmpl := template.Must(template.ParseFiles("index.html"))
+
+    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        if r.Method != http.MethodPost {
+            tmpl.Execute(w, nil)
+            return
+        }
+
+		port1 := r.FormValue("from")
+		port2 := r.FormValue("to")
+
+		strPort1 := findAirport(port1, airportMap)
+		strPort2 := findAirport(port2, airportMap)
+		
+		fromCountry := airportMap[strPort1].Country
+		toCountry := airportMap[strPort2].Country
+
+		consumption, km := computeFuel(strPort1, strPort2, airportMap)
+
+        tmpl.Execute(w, struct{ 
+			Success bool; 
+			Km float64; 
+			Consumption float64;
+			FromAirport string;
+			ToAirport string;
+			FromCountry string;
+			ToCountry string
+			}{
+				true, 
+				km, 
+				consumption,
+				strPort1,
+				strPort2,
+				fromCountry,
+				toCountry,
+			})
+    })
+
+    http.ListenAndServe(":8080", nil)
 }
