@@ -27,7 +27,6 @@ type latlon struct{
 	Lon float64
 	Country string
 }
-
 func makeMap(lines []string) map[string]latlon{
 	ret := make(map[string]latlon)
 	for _, line := range lines{
@@ -152,6 +151,5 @@ func main() {
 				toCountry,
 			})
     })
-
     http.ListenAndServe(":8080", nil)
 }
