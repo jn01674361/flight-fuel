@@ -19,7 +19,7 @@
                         <label>From</label>
                     </div>
                     <div class="form-group col-lg-11">
-                        <input type="text" name="from" form="my_form" class="form-control" placeholder="John F Kennedy">
+                        <input type="text" name="from" form="my_form" class="form-control" placeholder="Chicago O'Hare">
                     </div>
                 </div>
                 <div class="form-row">
@@ -34,15 +34,10 @@
                     <button type="submit" form="my_form" class="btn btn-lg btn-primary">Calculate!</button>
                 </div>
             </div>
-            
-                
-                
-                
-                
-                 
+                                                                                             
         </div>
         {{if .Success}}
-            <table class="table table-borderless">
+            <table class="table">
                 <tbody>
                     <tr>
                         <th scope="row">From</th>
@@ -58,12 +53,15 @@
                         <th scope="row">Distance </th>
                         <td>{{.Km}} km </td>
                     </tr>
-                    <tr>
+                    <!-- <tr class="table table-danger">
                         <th scope="row">Consumption </th>
                         <td>{{.Consumption}} L </td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
+            <div class="alert alert-danger" role="alert">
+                <b>Consumption</b>       {{.Consumption}} L
+            </div>
         {{else}}
             <h4>Consumption data will be posted once you have submitted the form.</h4>
         {{end}}

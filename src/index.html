@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="static/style.css"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+<body>
+    
+
+    <form method="POST" id="my_form"></form>
+    <div class="container">
+        <div class="jumbotron text-center">
+            <div class="container">
+                <div class="form-row">
+                    <h2>Calculate your flight's fuel consumption!</h2>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-1">
+                        <label>From</label>
+                    </div>
+                    <div class="form-group col-lg-11">
+                        <input type="text" name="from" form="my_form" class="form-control" placeholder="Chicago O'Hare">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-lg-1">
+                        <label>To</label>
+                    </div>
+                    <div class="form-group col-lg-11">
+                        <input type="text" name="to" form="my_form" class="form-control" placeholder="Amsterdam Schiphol">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button type="submit" form="my_form" class="btn btn-lg btn-primary">Calculate!</button>
+                </div>
+            </div>
+                                                                                             
+        </div>
+        {{if .Success}}
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">From</th>
+                        <td>{{.FromAirport}}</td>
+                        <td>{{.FromCountry}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">To </th>
+                        <td>{{.ToAirport}}</td>
+                        <td>{{.ToCountry}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Distance </th>
+                        <td>{{.Km}} km </td>
+                    </tr>
+                    <!-- <tr class="table table-danger">
+                        <th scope="row">Consumption </th>
+                        <td>{{.Consumption}} L </td>
+                    </tr> -->
+                </tbody>
+            </table>
+            <div class="alert alert-danger" role="alert">
+                <b>Consumption</b>       {{.Consumption}} L
+            </div>
+        {{else}}
+            <h4>Consumption data will be posted once you have submitted the form.</h4>
+        {{end}}
+    </div>
+    
+    <!-- <div class="row">
+        <div class="column" style="background-color:#aaa;">
+            <h1>Calculate Fuel</h1>
+            
+                
+            
+        </div>
+        <div class="column" style="background-color:#bbb;">
+            <h1> Consumption </h1>
+            {{if .Success}}
+                <p>
+                    From <b> {{.FromAirport}} </b>, <b> {{.FromCountry}} </b> to <b>{{.ToAirport}}</b>, <b> {{.ToCountry}} </b> :
+                </p>
+                <h3> {{.Km}} km </h3>
+                <h3> {{.Consumption}} L </h3></br>
+            {{else}}
+                <h4>Consumption data will be posted once you have submitted the form.</h4>
+            {{end}}
+        </div>
+    </div> -->
+    
+
+</body>

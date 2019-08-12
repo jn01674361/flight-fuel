@@ -12,7 +12,8 @@ import(
 	"github.com/umahmood/haversine"
 	"sort"
     "html/template"
-    "net/http"
+	"net/http"
+	"google.golang.org/appengine"
 )
 const(
 	gallonsMile int = 5
@@ -44,7 +45,6 @@ func makeMap(lines []string) map[string]latlon{
 			Country: country,
 		}
 		ret[airport] = info
-
 	}
 	return ret
 }
@@ -152,5 +152,5 @@ func main() {
 			})
 	})
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("/static/"))))
-    http.ListenAndServe(":8080", nil)
+    appengine.Main()
 }
